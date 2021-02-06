@@ -10,12 +10,16 @@ A live stock ticker for the [Adafruit MatrixPortal](https://learn.adafruit.com/a
 
 3. Download this repository and copy it into the CIRCUITPY removable media directory.
 
-4. Add a file called secrets.py with local network SSID and Password in the following format:
+4. Obtain a stock API key from [Alpha Vantage](https://www.alphavantage.co/) (API key is free and does not require any payment information).
+
+5. Add a file called secrets.py with local network SSID and Password, timezone, and Alpha Vantage API key in the following format:
 
 ```python
 secrets = {
     'ssid' : 'NETWORK NAME',
     'password' : 'PASSWORD',
+    'timezone': 'America/CITY',  # http://worldtimeapi.org/timezones
+    "apiKey": "APIKEY"
 }
 ```
 
