@@ -48,29 +48,12 @@ except ImportError:
     print("WiFi secrets are kept in secrets.py, please add them there!")
     raise
 
-# You can display in 'GBP', 'EUR' or 'USD'
-CURRENCY = "USD"
 TICKER = "GME"
 # Set up where we'll be fetching data from
 DATA_SOURCE = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={}&apikey={}".format(
     TICKER, secrets["apiKey"]
 )
 DATA_LOCATION = ["Global Quote", "05. price"]
-
-
-def format_ticker(val):
-    return TICKER
-
-
-def format_stock_price(val):
-    if CURRENCY == "USD":
-        return "$%s" % val
-    if CURRENCY == "EUR":
-        return "‎€%s" % val
-    if CURRENCY == "GBP":
-        return "£%s" % val
-    return "%s" % val
-
 
 # the current working directory (where this file is)
 cwd = ("/" + __file__).rsplit("/", 1)[0]
@@ -82,20 +65,30 @@ matrixportal = MatrixPortal(
     debug=False,
 )
 
+matrixportal.add_text(
+    text_font=terminalio.FONT,
+    text_position=(0, 5),
+    text_color=0xAF1F5C,
+)
 
 matrixportal.add_text(
     text_font=terminalio.FONT,
-    text_position=(10, 16),
+    text_position=(22, 16),
     text_color=0x3D1F5C,
-    text_transform=format_stock_price,
 )
 matrixportal.preload_font(b"$012345789")  # preload numbers
-matrixportal.preload_font((0x00A3, 0x20AC))  # preload gbp/euro symbol
+matrixportal.preload_font(b"ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 while True:
     try:
-        value = matrixportal.fetch()
-        print("Response is", value)
+        matrixportal.set_text(TICKER, 0)
+
+        newdata = matrixportal.network.fetch(DATA_SOURCE)
+        current_price = matrixportal.network.json_traverse(
+            newdata.json(), DATA_LOCATION
+        )
+        matrixportal.set_text("$" + current_price, 1)
+
     except (ValueError, RuntimeError) as e:
         print("Some error occured, retrying! -", e)
 
